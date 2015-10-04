@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# if [ $? -eq 0 ]; then
+
+# 	echo "Setting env variables"
+# 	CON=http://consul.service.consul:8500/v1/kv/zookeeper
+# 	curl -X PUT ${CON}/aws_access_key_id -d ${AWS_ACCESS_KEY_ID}
+# 	curl -X PUT ${CON}/aws_secret_access_key -d ${AWS_SECRET_ACCESS_KEY}
+
+# 	echo "Starting consul-template"
+# 	/usr/local/consul-template --once -config /app/conf/consul.conf
+# fi
+
+exec "$@"
