@@ -1,41 +1,24 @@
-FROM centos:6
+FROM ruppdog/base:0.0.1
 
-# hostname for consul service
-ENV CONSUL_HOST consul
+# Install Java
+RUN apk --update add openjdk8-jre
 
-# Install preqs
+# Install Zookeeper
+ENV ZOOKEEPER_VERSION 3.4.8
 RUN \
-	yum update -y && \
-	yum clean all && \
-	yum -y install \
-		tar
+    wget http://mirrors.ibiblio.org/apache/zookeeper/zookeeper-$ZOOKEEPER_VERSION/zookeeper-$ZOOKEEPER_VERSION.tar.gz && \
+    tar -C /app -xzvf zookeeper-$ZOOKEEPER_VERSION.tar.gz && \
+    rm zookeeper-$ZOOKEEPER_VERSION.tar.gz
 
-# Install Consul-Template
-ENV CT_VER 0.10.0
-ENV CT_NAME consul-template_${CT_VER}_linux_amd64
-ADD https://github.com/hashicorp/consul-template/releases/download/v${CT_VER}/${CT_NAME}.tar.gz /usr/local/${CT_NAME}.tgz
-RUN \
-	cd /usr/local/ && \
-	tar -zvxf /usr/local/${CT_NAME}.tgz && \
-	rm /usr/local/${CT_NAME}.tgz
-
-# TODO : Install Zookeeper
-
-# Copy folders
-COPY src /app/src
-COPY conf /app/conf
+# Copy templates
 COPY templates /app/templates
 
-# TODO : Expose ports
+# Set up entrypoint
+ADD entrypoint.sh /sbin/entrypoint.sh
+ENTRYPOINT ["/sbin/entrypoint.sh"]
 
-# TODO : Volumes for logs
-
-
-# mount start script
-ADD start /sbin/start
-
-# Run start script
-ENTRYPOINT ["/sbin/start"]
+# Set working directory
+WORKDIR /app/zookeeper-$ZOOKEEPER_VERSION/
 
 # Run command
-CMD ["bash"]
+CMD [ "bin/zkServer.sh", "start-foreground" ]
